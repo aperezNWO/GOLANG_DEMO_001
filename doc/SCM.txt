@@ -73,11 +73,7 @@ Build & Run locally:
 
     [{"id_column":1,"ciudad":"USA","nombreCompleto":"Pablo Alejandro Pérez Acosta"},...]                        
 
-## Build Docker image: 
-
-docker build -t go-ping-api .
-
-# Run Container: docker run -p 8080:8080 go-ping-api
+## Build Docker image:
 
 docker build -t golang_demo_001 . 
 
