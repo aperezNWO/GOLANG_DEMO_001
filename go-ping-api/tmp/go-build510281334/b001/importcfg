@@ -1,0 +1,11 @@
+# import config
+packagefile encoding/json=C:\Users\Vostro\AppData\Local\go-build\3c\3cd955387b72e443b65e50b091d29dd07019a77a8ca4a854e344ceb8d5f2e89e-d
+packagefile go-ping-api/pkg/algorithms=C:\Users\Vostro\AppData\Local\go-build\07\07c8af3eee1aa5aed7b51ac1e1aad947825f11f61ce9c1ee49e38779aef46131-d
+packagefile go-ping-api/pkg/dao=C:\Users\Vostro\AppData\Local\go-build\50\50f0f4d4db9c829d6b585ae8ca32289dc06b0bef4ef16512f6cabef462b45ce0-d
+packagefile go-ping-api/pkg/fractals=C:\Users\Vostro\AppData\Local\go-build\39\39ecc46570d9580dfaa27419746bb071b84c96b4a0d86b680512df89d21dcdac-d
+packagefile log=C:\Users\Vostro\AppData\Local\go-build\c0\c0a1d0bc5df7648ddd30f642bd5aa256016c46814fd7a6d4960dbaa3a6571668-d
+packagefile net/http=C:\Users\Vostro\AppData\Local\go-build\e5\e540bc3ad0d66afab799600767faec4bf6807caf8b191440c32af0a39f8bf48b-d
+packagefile os=C:\Users\Vostro\AppData\Local\go-build\b6\b66fd0334c384368eed21d7cb0a485e18ee8095aae83f0788edcd161a34c3df1-d
+packagefile strconv=C:\Users\Vostro\AppData\Local\go-build\75\75403f6f4da26d8534778b2a06d4ff7e0b298ee259842dab31c714383255f395-d
+packagefile time=C:\Users\Vostro\AppData\Local\go-build\97\976e05898f4756d7ff3fe53b9dba0a1221b4c78e0be0c358097738388eb4f538-d
+packagefile runtime=C:\Users\Vostro\AppData\Local\go-build\2f\2fb2d66f2c64a9616e47a72ef36dd5b1c9625ade475598b384099a07c3fbc5df-d

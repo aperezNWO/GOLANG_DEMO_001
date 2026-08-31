@@ -7,15 +7,12 @@ import (
 	_ "github.com/microsoft/go-mssqldb"
 )
 
-// Replace this line:
-// const connString = "server=webapiangulardemo.mssql.somee.com;port=1433;user id=aperezNWO_SQLLogin_1;password=aperezNWO_SQLLogin_1;database=webapiangulardemo;encrypt=false"
-
 // With this line:
 const connString = "server=webapiangulardemo.mssql.somee.com;port=1433;user id=aperezNWO_SQLLogin_1;password=aperezNWO_SQLLogin_1;database=webapiangulardemo;encrypt=false;TrustServerCertificate=true"
 
 // AccessLog mirrors AccessLog entity struct
 type AccessLog struct {
-	IDColumn   int64   `json:"id_column"`
+	IDColumn   int64   `json:"id_Column"`
 	PageName   *string `json:"pageName"`
 	AccessDate *string `json:"accessDate"`
 	IPValue    *string `json:"ipValue"`
@@ -23,7 +20,7 @@ type AccessLog struct {
 
 // PersonaTable mirrors PersonaTable entity struct
 type PersonaTable struct {
-	IDColumn       int64   `json:"id_column"`
+	IDColumn       int64   `json:"id_Column"`
 	Ciudad         *string `json:"ciudad"`
 	NombreCompleto *string `json:"nombreCompleto"`
 }

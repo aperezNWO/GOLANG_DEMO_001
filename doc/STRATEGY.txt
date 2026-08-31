@@ -1,0 +1,33 @@
+├── 1. Presentation & Client Layer
+│   └── Angular 21 (TypeScript)
+│
+├── 2. Core Business Logic & Enterprise Services
+│   ├── Spring Boot (Java)
+│   ├── Spring Boot (Kotlin)
+│   ├── Django (Python)
+│   ├── .NET Core (C#)
+│   ├── Node.js (JavaScript)
+│   └── Shelf (Dart)
+│
+└── 3. Computational Engines & High-Performance Microservices
+    ├── C++ (.NET Wrappers / OpenCV Engine)
+    ├── Go (Axum/Gin - Fractal Engine)
+    └── Rust (Axum - High-Throughput Compute Engine)
+
+//////////////////////////////////////////////////////////////
+
+go-ping-api/
+├── main.go
+├── go.mod
+├── Dockerfile
+└── pkg/
+    ├── algorithms/
+    │   └── algorithms.go
+    ├── dao/
+    │   └── dao.go
+    └── fractals/
+        └── fractals.go
+
+//////////////////////////////////////////////////////////////
+
+        

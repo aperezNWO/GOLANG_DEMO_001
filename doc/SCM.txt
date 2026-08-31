@@ -1,0 +1,104 @@
+///////////////////////////////////////////////////////////
+
+echo "# GOLANG_DEMO_001" >> README.md
+git init
+git add *
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/aperezNWO/GOLANG_DEMO_001.git
+git push -u origin main
+
+///////////////////////////////////////////////////////////
+
+https://go.dev/dl/
+
+go get github.com/microsoft/go-mssqldb
+go mod tidy
+
+///////////////////////////////////////////////////////////
+
+Step 1: Install or Reinstall gopls
+
+Open VS Code.
+
+Open the Command Palette using Ctrl + Shift + P.
+
+Type and select: Go: Install/Update Tools.
+
+Check the box for gopls (and any other missing Go utilities like dlv or gofmt).
+
+Click OK to let VS Code download and compile the tool binaries.
+
+///////////////////////////////////////////////////////////
+
+go install golang.org/x/tools/gopls@latest
+
+setx GOTMPDIR "D:\usuarios\pabloperez\dev\golang\GOLANG_DEMO_001\go-ping-api\tmp"
+
+///////////////////////////////////////////////////////////
+
+
+Development Workflow:
+
+Build & Run locally: 
+
+    # go run main.go
+
+    #.\app.exe
+
+    go build -o app.exe .
+
+    go run .
+
+    curl -i http://localhost:8080/ping
+
+    HTTP/1.1 204 No Content
+    Access-Control-Allow-Credentials: true
+    Access-Control-Allow-Headers: *
+    Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+    Access-Control-Allow-Origin: *
+    Date: Sat, 29 Aug 2026 02:12:29 GMT
+
+    curl http://localhost:8080/api/fractals/generate?kind=3&maxIterations=500"
+
+    [... ,{"x":798,"y":0,"intensity":200},{"x":799,"y":0,"intensity":200}]
+
+    curl http://localhost:8080/api/data/getAllLogs
+
+    ## TLS Handshake failed: tls: failed to verify certificate: x509: certificate signed by unknown authority
+
+    [{"id_column":175760,"pageName":"PAGE_ANGULAR_DEMO_INDEX","accessDate":"2026-08-27T21:25:33.443Z","ipValue":"181.55.220.94"},...]
+
+    curl http://localhost:8080/api/data/getAllPersons
+
+    [{"id_column":1,"ciudad":"USA","nombreCompleto":"Pablo Alejandro Pérez Acosta"},...]                        
+
+## Build Docker image: 
+
+docker build -t go-ping-api .
+
+# Run Container: docker run -p 8080:8080 go-ping-api
+
+docker build -t golang_demo_001 . 
+
+///////////////////////////////////////////////////////////
+
+# create a tag previous to publish
+3) docker tag golang_demo_001:latest apereznwogmail/golang_demo_001:latest
+
+# log into docker for publish
+# get PAT from https://app.docker.com/accounts/apereznwogmail/settings/personal-access-tokens
+## must return 'Login Succeeded'
+# 4.1) docker login
+4.1 ) echo "YOUR_PAT_HERE" | docker login --username apereznwogmail --password-stdin
+
+# publish in docker hub
+# https://hub.docker.com/
+5) docker push apereznwogmail/golang_demo_001:latest 
+
+# URL FOR RENDER : https://dashboard.render.com/
+6) docker.io/apereznwogmail/golang_demo_001:latest
+
+# CRONJOB
+
+///////////////////////////////////////////////////////////
