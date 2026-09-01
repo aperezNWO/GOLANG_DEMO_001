@@ -73,6 +73,7 @@ Build & Run locally:
 
     go run .
 
+    # git bash / cmd
     curl -i http://localhost:8080/ping
 
     HTTP/1.1 204 No Content
@@ -82,7 +83,8 @@ Build & Run locally:
     Access-Control-Allow-Origin: *
     Date: Sat, 29 Aug 2026 02:12:29 GMT
 
-    curl http://localhost:8080/api/fractals/generate?kind=3&maxIterations=500"
+    # git bash / cmd
+    curl http://localhost:8080/api/fractals/generate?kind=3&maxIterations=500
 
     [... ,{"x":798,"y":0,"intensity":200},{"x":799,"y":0,"intensity":200}]
 
@@ -95,6 +97,24 @@ Build & Run locally:
     curl http://localhost:8080/api/data/getAllPersons
 
     [{"id_column":1,"ciudad":"USA","nombreCompleto":"Pablo Alejandro Pérez Acosta"},...]                        
+
+
+    ## powershell 
+
+    go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest
+
+    ### git bash - ok localhost
+    echo '{"kind": 1, "max_iterations": 500, "x_min": -2.0, "x_max": 1.0, "y_min": -1.2, "y_max": 1.2}' | grpcurl -max-msg-sz 15728640 -plaintext -d @ localhost:50051 fractal.FractalService/GetFractal
+
+    ### git bash - ok https://golang-demo-001-latest-csb6.onrender.com
+
+    curl -X POST "https://golang-demo-001-latest-csb6.onrender.com/fractal.FractalService/GetFractal" \
+    -H "Content-Type: application/grpc-web-text" \
+    -H "Accept: application/grpc-web-text" \
+    -H "X-User-Agent: grpc-web-javascript/0.1" \
+    --data-raw "AAAAAAYIAUABGAE="
+
+///////////////////////////////////////////////////////////
 
 ## Build Docker image:
 
@@ -121,3 +141,6 @@ docker build -t golang_demo_001 .
 # CRONJOB
 
 ///////////////////////////////////////////////////////////
+
+
+
