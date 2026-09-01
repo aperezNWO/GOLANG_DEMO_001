@@ -30,4 +30,23 @@ go-ping-api/
 
 //////////////////////////////////////////////////////////////
 
+my-go-backend/
+├── proto/                     <-- Root level: Shared protobuf definitions
+│   └── fractal.proto
+├── pkg/                       <-- Internal Go packages
+│   ├── fractals/
+│   │   └── fractals.go
+│   └── grpc/
+│       ├── pb/                <-- Generated Go code (.pb.go) goes here
+│       │   ├── fractal.pb.go
+│       │   └── fractal_grpc.pb.go
+│       └── service.go
+├── Dockerfile
+├── go.mod
+└── main.go
+
+//////////////////////////////////////////////////////////////
+
+
+
         

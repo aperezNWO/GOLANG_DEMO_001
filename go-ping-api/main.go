@@ -11,6 +11,11 @@ import (
 	"go-ping-api/pkg/algorithms"
 	"go-ping-api/pkg/dao"
 	"go-ping-api/pkg/fractals"
+	grpcservice "go-ping-api/pkg/grpc/pb"
+	pb "go-ping-api/pkg/grpc/pb/proto"
+
+	"github.com/improbable-eng/grpc-web/go/grpcweb"
+	"google.golang.org/grpc"
 )
 
 var (
@@ -24,23 +29,37 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	// Routes
+	// REST Routes
 	mux.HandleFunc("GET /ping", handlePing)
 	mux.HandleFunc("GET /api/fractals/generate", handleFractalGenerate)
 	mux.HandleFunc("GET /GenerateRandomVertex_SpringBoot", handleRandomVertex)
 	mux.HandleFunc("GET /api/data/getAllLogs", handleGetAllLogs)
 	mux.HandleFunc("GET /api/data/getAllPersons", handleGetAllPersons)
 
-	// Middleware Pipeline
-	handler := recoveryMiddleware(corsMiddleware(loggingMiddleware(mux)))
+	// Wrap REST Mux with Middlewares
+	restHandler := recoveryMiddleware(corsMiddleware(loggingMiddleware(mux)))
+
+	// Register gRPC Service & Wrap with gRPC-Web
+	grpcServer := grpc.NewServer()
+	pb.RegisterFractalServiceServer(grpcServer, grpcservice.NewServer(fractalEngine))
+	wrappedGrpc := grpcweb.WrapServer(grpcServer)
+
+	// Combine REST and gRPC-Web into a single HTTP Multiplexing Handler
+	combinedHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if wrappedGrpc.IsGrpcWebRequest(r) || wrappedGrpc.IsAcceptableGrpcCorsRequest(r) {
+			wrappedGrpc.ServeHTTP(w, r)
+			return
+		}
+		restHandler.ServeHTTP(w, r)
+	})
 
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
 
-	log.Printf("Go server initialized on port %s...", port)
-	if err := http.ListenAndServe(":"+port, handler); err != nil {
+	log.Printf("Go server initialized (REST + gRPC-Web) on port %s...", port)
+	if err := http.ListenAndServe(":"+port, combinedHandler); err != nil {
 		log.Fatalf("Server launch failure: %v", err)
 	}
 }
