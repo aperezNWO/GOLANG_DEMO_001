@@ -19,6 +19,7 @@ import (
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+
 )
 
 var (
@@ -61,16 +62,24 @@ func main() {
 	mux.HandleFunc("GET /api/data/getAllLogs", handleGetAllLogs)
 	mux.HandleFunc("GET /api/data/getAllPersons", handleGetAllPersons)
 
+	// Wrap REST mux with custom middleware pipeline
 	restHandler := recoveryMiddleware(corsMiddleware(loggingMiddleware(mux)))
 
 	// 4. Wrap gRPC for Browser Clients (gRPC-Web multiplexed on HTTP/1.1)
-	wrappedGrpc := grpcweb.WrapServer(grpcServer)
+	wrappedGrpc := grpcweb.WrapServer(
+		grpcServer,
+		grpcweb.WithOriginFunc(func(origin string) bool {
+			return origin == "https://apereznwo.github.io" || origin == "http://localhost:4200"
+		}),
+	)
 
+	// Combined multiplexer passing non-gRPC requests to restHandler
 	combinedHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if wrappedGrpc.IsGrpcWebRequest(r) || wrappedGrpc.IsAcceptableGrpcCorsRequest(r) {
 			wrappedGrpc.ServeHTTP(w, r)
 			return
 		}
+		// Serves HTTP/REST through recovery, CORS, and logging middleware
 		restHandler.ServeHTTP(w, r)
 	})
 
@@ -84,6 +93,7 @@ func main() {
 		log.Fatalf("Server launch failure: %v", err)
 	}
 }
+
 // Middlewares
 func loggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

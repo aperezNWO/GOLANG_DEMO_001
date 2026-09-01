@@ -49,6 +49,8 @@ setx GOTMPDIR "D:\usuarios\pabloperez\dev\golang\GOLANG_DEMO_001\go-ping-api\tmp
 
     go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
     go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+    go get github.com/rs/cors
+    go install github.com/rs/cors
 
     $env:Path += ";$env:USERPROFILE\go\bin"
 
