@@ -77,6 +77,10 @@ func (e *Engine) GenerateMandelbrot(bounds Bounds, maxIterations int) []FractalP
 	xRange := bounds.XMax - bounds.XMin
 	yRange := bounds.YMax - bounds.YMin
 
+	if xRange <= 0 || yRange <= 0 {
+		return []FractalPoint{}
+	}
+
 	for screenY := 0; screenY < CanvasHeight; screenY++ {
 		for screenX := 0; screenX < CanvasWidth; screenX++ {
 			cRe := bounds.XMin + (float64(screenX) * xRange / float64(CanvasWidth))

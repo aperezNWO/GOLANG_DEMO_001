@@ -3,7 +3,7 @@ package grpcservice
 import (
 	"context"
 	"go-ping-api/pkg/fractals"
-	 pb "go-ping-api/pkg/grpc/pb/proto"
+	pb "go-ping-api/pkg/grpc/pb/proto"
 )
 
 type Server struct {
@@ -26,12 +26,18 @@ func (s *Server) GetFractal(ctx context.Context, req *pb.FractalRequest) (*pb.Fr
 		maxIter = 500
 	}
 
-	bounds := fractals.Bounds{
-		XMin: req.XMin, XMax: req.XMax,
-		YMin: req.YMin, YMax: req.YMax,
+	var bounds fractals.Bounds
+
+	if req.XMin == 0 && req.XMax == 0 && req.YMin == 0 && req.YMax == 0 {
+		bounds = fractals.Bounds{XMin: -2.0, XMax: 1.0, YMin: -1.2, YMax: 1.2}
+	} else {
+		bounds = fractals.Bounds{
+			XMin: req.XMin, XMax: req.XMax,
+			YMin: req.YMin, YMax: req.YMax,
+		}
 	}
 
-	if bounds.XMin == 0 && bounds.XMax == 0 {
+	if bounds.XMin >= bounds.XMax || bounds.YMin >= bounds.YMax {
 		bounds = fractals.Bounds{XMin: -2.0, XMax: 1.0, YMin: -1.2, YMax: 1.2}
 	}
 

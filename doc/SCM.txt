@@ -52,12 +52,6 @@ setx GOTMPDIR "D:\usuarios\pabloperez\dev\golang\GOLANG_DEMO_001\go-ping-api\tmp
     go get github.com/rs/cors
     go install github.com/rs/cors
 
-    $env:Path += ";$env:USERPROFILE\go\bin"
-
-    [System.Environment]::SetEnvironmentVariable("Path", $env:Path + ";$env:USERPROFILE\go\bin", [System.EnvironmentVariableTarget]::User)
-
-    -- [_]  protoc --go_out=pkg/grpc/pb --go_opt=paths=source_relative --go-grpc_out=pkg/grpc/pb --go-grpc_opt=paths=source_relative proto/fractal.proto
-
 ///////////////////////////////////////////////////////////
 
 Development Workflow:
@@ -65,7 +59,12 @@ Development Workflow:
 Build & Run locally: 
 
     # 1. Regenerate protobuf files
-    protoc --go_out=pkg/grpc/pb --go_opt=paths=source_relative --go-grpc_out=pkg/grpc/pb --go-grpc_opt=paths=source_relative proto/fractal.proto
+
+    $env:Path += ";$env:USERPROFILE\go\bin"
+
+    [System.Environment]::SetEnvironmentVariable("Path", $env:Path + ";$env:USERPROFILE\go\bin", [System.EnvironmentVariableTarget]::User)
+
+    -- [_]  protoc --go_out=pkg/grpc/pb --go_opt=paths=source_relative --go-grpc_out=pkg/grpc/pb --go-grpc_opt=paths=source_relative proto/fractal.proto
 
     # 2. Automatically resolve and fetch missing dependencies
     go mod tidy
