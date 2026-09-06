@@ -107,8 +107,8 @@ Build & Run locally:
 
     ### git bash - ok localhost 
 
-    ## BARNSLEY FERN
-    echo '{"kind": 3}' | grpcurl -plaintext -proto proto/fractal.proto -d @ localhost:8080 fractal.FractalService/GetFractal
+    ## GPRC BARNSLEY FERN - POWERSHELL
+    grpcurl -plaintext -max-msg-sz 67108864 -import-path "D:\usuarios\pabloperez\dev\cpp\CPP_GCC_ALGORITHM\fractalEngineRPC" -proto "D:\usuarios\pabloperez\dev\cpp\CPP_GCC_ALGORITHM\fractalEngineRPC\fractal.proto" -d '{\"kind\": 3, \"max_iterations\": 50}' localhost:50051 fractal.FractalService/GenerateFractal
     
     ### git bash - ok https://golang-demo-001-latest.onrender.com/
 
@@ -119,21 +119,24 @@ Build & Run locally:
     --data-raw "AAAAAAYIAUABGAE="
 
 ///////////////////////////////////////////////////////////
+// DOCKER
+///////////////////////////////////////////////////////////
 
 ## Build Docker image:
 
 docker build -t golang_demo_001 . 
 
-///////////////////////////////////////////////////////////
-
-# create a tag previous to publish
+## create a tag previous to publish
 3) docker tag golang_demo_001:latest apereznwogmail/golang_demo_001:latest
 
-# log into docker for publish
-# get PAT from https://app.docker.com/accounts/apereznwogmail/settings/personal-access-tokens
-## must return 'Login Succeeded'
-# 4.1) docker login
-4.1 ) echo "YOUR_PAT_HERE" | docker login --username apereznwogmail --password-stdin
+## log into docker for publish
+    ## if docker desktop installed
+      4.1) docker login
+
+    ## get PAT from https://app.docker.com/accounts/apereznwogmail/settings/personal-access-tokens
+      4.1) echo "YOUR_PAT_HERE" | docker login --username apereznwogmail --password-stdin
+    
+    ## must return 'Login Succeeded'
 
 # publish in docker hub
 # https://hub.docker.com/

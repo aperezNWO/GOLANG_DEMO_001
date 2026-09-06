@@ -73,27 +73,11 @@ func main() {
 
 		// 2. Handle gRPC-Web POST requests
 		if wrappedGrpc.IsGrpcWebRequest(r) {
-			// Logged unconditionally, before anything else, so we can tell
-			// whether the request reaches the Go process at all — vs. Render's
-			// own proxy returning something during a cold-start window before
-			// this code ever runs.
-			log.Printf("gRPC-Web request received: %s %s", r.Method, r.URL.Path)
-
 			w.Header().Set("Access-Control-Allow-Origin", "*")
 			w.Header().Set("Access-Control-Expose-Headers", "grpc-status, grpc-message, grpc-status-details-bin")
 
-			// Serve gRPC-Web payload, with its own panic recovery — previously
-			// a panic here would fall through to Go's default per-connection
-			// handling, which just severs the connection with zero bytes
-			// written instead of logging anything useful.
-			func() {
-				defer func() {
-					if err := recover(); err != nil {
-						log.Printf("gRPC-Web panic recovered: %v", err)
-					}
-				}()
-				wrappedGrpc.ServeHTTP(w, r)
-			}()
+			// Serve gRPC-Web payload
+			wrappedGrpc.ServeHTTP(w, r)
 
 			// Force flush to signal response completion directly to Render proxy
 			if flusher, ok := w.(http.Flusher); ok {

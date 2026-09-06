@@ -2,9 +2,14 @@ package grpcservice
 
 import (
 	"context"
+	"time"
+
 	"go-ping-api/pkg/fractals"
 	pb "go-ping-api/pkg/grpc/pb/proto"
 )
+
+// Limit to 2 concurrent fractal calculations to protect instance CPU limits
+var sem = make(chan struct{}, 2)
 
 type Server struct {
 	pb.UnimplementedFractalServiceServer
@@ -16,6 +21,18 @@ func NewServer(engine *fractals.Engine) *Server {
 }
 
 func (s *Server) GetFractal(ctx context.Context, req *pb.FractalRequest) (*pb.FractalResponse, error) {
+	// Enforce a 10-second request timeout[cite: 5]
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+
+	// Acquire a semaphore slot to regulate concurrent heavy calculations
+	select {
+	case sem <- struct{}{}:
+		defer func() { <-sem }()
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	}
+
 	kind, err := fractals.ParseFractalKind(int(req.Kind))
 	if err != nil {
 		kind = fractals.Mandelbrot
