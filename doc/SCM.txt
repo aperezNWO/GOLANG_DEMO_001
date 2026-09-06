@@ -104,8 +104,12 @@ Build & Run locally:
 
     go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest
 
-    ### git bash - ok localhost
+    ### git bash - ok localhost 
+    ## MANDELBROT
     echo '{"kind": 1, "max_iterations": 500, "x_min": -2.0, "x_max": 1.0, "y_min": -1.2, "y_max": 1.2}' | grpcurl -max-msg-sz 15728640 -plaintext -d @ localhost:50051 fractal.FractalService/GetFractal
+
+    ## BARNSLEY FERN
+    echo '{"kind": 3}' | grpcurl -max-msg-sz 15728640 -plaintext -d @ localhost:50051 fractal.FractalService/GetFractal
 
     ### git bash - ok https://golang-demo-001-latest-csb6.onrender.com
 
