@@ -82,16 +82,24 @@ func main() {
 		port = "8080"
 	}
 
-	// 4. Configure http.Server with h2c for unencrypted HTTP/2 multiplexing (required by Render proxies)
-	h2s := &http2.Server{}
-	server := &http.Server{
-		Addr:    ":" + port,
-		Handler: h2c.NewHandler(combinedHandler, h2s),
-	}
+	// 4. Instantiate server using helper function
+	server := createServer(port, combinedHandler)
 
 	log.Printf("Go server initialized (REST + gRPC + gRPC-Web) on port %s...", port)
 	if err := server.ListenAndServe(); err != nil {
 		log.Fatalf("Server launch failure: %v", err)
+	}
+}
+
+// Factory function encapsulating server timeout configurations and h2c multiplexing
+func createServer(port string, handler http.Handler) *http.Server {
+	h2s := &http2.Server{}
+	return &http.Server{
+		Addr:         ":" + port,
+		Handler:      h2c.NewHandler(handler, h2s),
+		ReadTimeout:  15 * time.Second,
+		WriteTimeout: 15 * time.Second,
+		IdleTimeout:  30 * time.Second, // Recycles idle Render proxy connections
 	}
 }
 
