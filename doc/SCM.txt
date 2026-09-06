@@ -119,6 +119,8 @@ Build & Run locally:
     -H "X-User-Agent: grpc-web-javascript/0.1" \
     --data-raw "AAAAAAYIAUABGAE="
 
+    echo '{"kind": 3}' | grpcurl -max-msg-sz 15728640 -plaintext -d @ https://golang-demo-001-latest-csb6.onrender.com:50051 fractal.FractalService/GetFractal
+
 ///////////////////////////////////////////////////////////
 
 ## Build Docker image:

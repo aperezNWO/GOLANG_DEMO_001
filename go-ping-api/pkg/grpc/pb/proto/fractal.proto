@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package fractal;
+option go_package = "go-ping-api/pkg/grpc/pb";
+
+message FractalRequest {
+  int32 kind = 1;
+  int32 max_iterations = 2;
+  double x_min = 3;
+  double x_max = 4;
+  double y_min = 5;
+  double y_max = 6;
+}
+
+message Point {
+  double x = 1;
+  double y = 2;
+  int32 intensity = 3;
+}
+
+message FractalResponse {
+  repeated Point points = 1;
+}
+
+service FractalService {
+  rpc GetFractal (FractalRequest) returns (FractalResponse);
+}
