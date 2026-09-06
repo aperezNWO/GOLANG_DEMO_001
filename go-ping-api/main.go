@@ -61,24 +61,38 @@ func main() {
 
 	// Combined multiplexer passing requests to gRPC-Web, native gRPC (via ServeHTTP), or restHandler
 	combinedHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Flush buffer upon completion to force Render proxy stream resets
-		if flusher, ok := w.(http.Flusher); ok {
-			defer flusher.Flush()
-		}
-
-		// Handle gRPC-Web requests
-		if wrappedGrpc.IsGrpcWebRequest(r) || wrappedGrpc.IsAcceptableGrpcCorsRequest(r) {
-			wrappedGrpc.ServeHTTP(w, r)
+		// 1. Handle ALL CORS preflights (OPTIONS) immediately to prevent browser timeouts
+		if r.Method == http.MethodOptions {
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Accept, X-User-Agent, X-Grpc-Web, grpc-timeout")
+			w.Header().Set("Access-Control-Expose-Headers", "grpc-status, grpc-message, grpc-status-details-bin")
+			w.WriteHeader(http.StatusNoContent)
 			return
 		}
 
-		// Handle native gRPC requests over HTTP/2
+		// 2. Handle gRPC-Web POST requests
+		if wrappedGrpc.IsGrpcWebRequest(r) {
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+			w.Header().Set("Access-Control-Expose-Headers", "grpc-status, grpc-message, grpc-status-details-bin")
+
+			// Serve gRPC-Web payload
+			wrappedGrpc.ServeHTTP(w, r)
+
+			// Force flush to signal response completion directly to Render proxy
+			if flusher, ok := w.(http.Flusher); ok {
+				flusher.Flush()
+			}
+			return
+		}
+
+		// 3. Handle native gRPC requests over HTTP/2
 		if r.ProtoMajor == 2 && r.Header.Get("Content-Type") == "application/grpc" {
 			grpcServer.ServeHTTP(w, r)
 			return
 		}
 
-		// Serves HTTP/REST through recovery, CORS, and logging middleware
+		// 4. Serves HTTP/REST through recovery, CORS, and logging middleware
 		restHandler.ServeHTTP(w, r)
 	})
 
@@ -102,9 +116,9 @@ func createServer(port string, handler http.Handler) *http.Server {
 	return &http.Server{
 		Addr:         ":" + port,
 		Handler:      h2c.NewHandler(handler, h2s),
-		ReadTimeout:  15 * time.Second,
-		WriteTimeout: 15 * time.Second,
-		IdleTimeout:  30 * time.Second, // Recycles idle Render proxy connections
+		ReadTimeout:  10 * time.Second, // Tightened read deadline
+		WriteTimeout: 10 * time.Second, // Tightened write deadline
+		IdleTimeout:  15 * time.Second, // Recycles idle Render proxy connection slots faster
 	}
 }
 
