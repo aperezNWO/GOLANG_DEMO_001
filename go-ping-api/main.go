@@ -2,24 +2,22 @@ package main
 
 import (
 	"encoding/json"
+	"go-ping-api/pkg/algorithms"
+	"go-ping-api/pkg/dao"
+	"go-ping-api/pkg/fractals"
+	grpcservice "go-ping-api/pkg/grpc/pb"
+	pb "go-ping-api/pkg/grpc/pb/proto"
 	"log"
-	"net"
 	"net/http"
 	"os"
 	"strconv"
 	"time"
 
-	"go-ping-api/pkg/algorithms"
-	"go-ping-api/pkg/dao"
-	"go-ping-api/pkg/fractals"
-
-	grpcservice "go-ping-api/pkg/grpc/pb"
-	pb "go-ping-api/pkg/grpc/pb/proto"
-
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
+	"golang.org/x/net/http2"
+	"golang.org/x/net/http2/h2c"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
-
 )
 
 var (
@@ -42,19 +40,7 @@ func main() {
 	pb.RegisterFractalServiceServer(grpcServer, grpcservice.NewServer(fractalEngine))
 	reflection.Register(grpcServer) // Enables auto-discovery for grpcurl
 
-	// 2. Start Native gRPC Listener on Port 50051 (For grpcurl & native gRPC clients)
-	go func() {
-		lis, err := net.Listen("tcp", ":50051")
-		if err != nil {
-			log.Fatalf("Failed to listen on gRPC port 50051: %v", err)
-		}
-		log.Printf("Native gRPC server listening on :50051...")
-		if err := grpcServer.Serve(lis); err != nil {
-			log.Fatalf("gRPC server error: %v", err)
-		}
-	}()
-
-	// 3. HTTP REST Routes
+	// 2. HTTP REST Routes
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /ping", handlePing)
 	mux.HandleFunc("GET /api/fractals/generate", handleFractalGenerate)
@@ -65,7 +51,7 @@ func main() {
 	// Wrap REST mux with custom middleware pipeline
 	restHandler := recoveryMiddleware(corsMiddleware(loggingMiddleware(mux)))
 
-	// 4. Wrap gRPC for Browser Clients (gRPC-Web multiplexed on HTTP/1.1)
+	// 3. Wrap gRPC for Browser Clients (gRPC-Web)
 	wrappedGrpc := grpcweb.WrapServer(
 		grpcServer,
 		grpcweb.WithOriginFunc(func(origin string) bool {
@@ -73,12 +59,20 @@ func main() {
 		}),
 	)
 
-	// Combined multiplexer passing non-gRPC requests to restHandler
+	// Combined multiplexer passing requests to gRPC-Web, native gRPC (via ServeHTTP), or restHandler
 	combinedHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Handle gRPC-Web requests
 		if wrappedGrpc.IsGrpcWebRequest(r) || wrappedGrpc.IsAcceptableGrpcCorsRequest(r) {
 			wrappedGrpc.ServeHTTP(w, r)
 			return
 		}
+
+		// Handle native gRPC requests over HTTP/2
+		if r.ProtoMajor == 2 && r.Header.Get("Content-Type") == "application/grpc" {
+			grpcServer.ServeHTTP(w, r)
+			return
+		}
+
 		// Serves HTTP/REST through recovery, CORS, and logging middleware
 		restHandler.ServeHTTP(w, r)
 	})
@@ -88,8 +82,15 @@ func main() {
 		port = "8080"
 	}
 
-	log.Printf("Go server initialized (REST + gRPC-Web) on port %s...", port)
-	if err := http.ListenAndServe(":"+port, combinedHandler); err != nil {
+	// 4. Configure http.Server with h2c for unencrypted HTTP/2 multiplexing (required by Render proxies)
+	h2s := &http2.Server{}
+	server := &http.Server{
+		Addr:    ":" + port,
+		Handler: h2c.NewHandler(combinedHandler, h2s),
+	}
+
+	log.Printf("Go server initialized (REST + gRPC + gRPC-Web) on port %s...", port)
+	if err := server.ListenAndServe(); err != nil {
 		log.Fatalf("Server launch failure: %v", err)
 	}
 }
