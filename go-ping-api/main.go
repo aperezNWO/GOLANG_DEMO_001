@@ -61,6 +61,11 @@ func main() {
 
 	// Combined multiplexer passing requests to gRPC-Web, native gRPC (via ServeHTTP), or restHandler
 	combinedHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Flush buffer upon completion to force Render proxy stream resets
+		if flusher, ok := w.(http.Flusher); ok {
+			defer flusher.Flush()
+		}
+
 		// Handle gRPC-Web requests
 		if wrappedGrpc.IsGrpcWebRequest(r) || wrappedGrpc.IsAcceptableGrpcCorsRequest(r) {
 			wrappedGrpc.ServeHTTP(w, r)
