@@ -100,8 +100,72 @@ Build & Run locally:
 
     [{"id_column":1,"ciudad":"USA","nombreCompleto":"Pablo Alejandro Pérez Acosta"},...]                        
 
+    curl http://localhost:8080//api/version/go
+    
+      Advertencia de seguridad: riesgo de ejecución de script
+      Invoke-WebRequest analiza el contenido de la página web. El código de script de la página web se puede ejecutar cuando se 
+      analiza la página.
+      ACCIÓN RECOMENDADA:                                                                                                   
+      Usa el modificador -UseBasicParsing para evitar la ejecución de código de script.                                     
+                                                                                                                            
+      ¿Quieres continuar?                                                                                                   
+    
+      [S] Sí  [O] Sí a todo  [N] No  [T] No a todo  [U] Suspender  [?] Ayuda (el valor predeterminado es "N"): s
 
-    ## powershell 
+
+      StatusCode        : 200
+      StatusDescription : OK
+      Content           : {"go_version":"go1.27.0"}
+                          
+      RawContent        : HTTP/1.1 200 OK
+                          Access-Control-Allow-Credentials: true
+                          Access-Control-Allow-Headers: *
+                          Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+                          Access-Control-Allow-Origin: *
+                          Pragma: no-cach...
+      Forms             : {}
+      Headers           : {[Access-Control-Allow-Credentials, true], [Access-Control-Allow-Headers, *], 
+                          [Access-Control-Allow-Methods, GET, POST, PUT, DELETE, OPTIONS], [Access-Control-Allow-Origin, *]...}
+      Images            : {}
+      InputFields       : {}
+      Links             : {}
+      ParsedHtml        : mshtml.HTMLDocumentClass
+      RawContentLength  : 26
+
+      curl http://localhost:8080//api/version/server 
+
+      Advertencia de seguridad: riesgo de ejecución de script                                                                     
+      Invoke-WebRequest analiza el contenido de la página web. El código de script de la página web se puede ejecutar cuando se   
+      analiza la página.                                                                                                          
+            ACCIÓN RECOMENDADA:
+            Usa el modificador -UseBasicParsing para evitar la ejecución de código de script.
+
+            ¿Quieres continuar?
+          
+      [S] Sí  [O] Sí a todo  [N] No  [T] No a todo  [U] Suspender  [?] Ayuda (el valor predeterminado es "N"): S
+
+
+      StatusCode        : 200
+      StatusDescription : OK
+      Content           : {"server_version":"1.0.0"}
+                          
+      RawContent        : HTTP/1.1 200 OK
+                          Access-Control-Allow-Credentials: true
+                          Access-Control-Allow-Headers: *
+                          Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+                          Access-Control-Allow-Origin: *
+                          Pragma: no-cach...
+      Forms             : {}
+      Headers           : {[Access-Control-Allow-Credentials, true], [Access-Control-Allow-Headers, *], 
+                          [Access-Control-Allow-Methods, GET, POST, PUT, DELETE, OPTIONS], [Access-Control-Allow-Origin, *]...}
+      Images            : {}
+      InputFields       : {}
+      Links             : {}
+      ParsedHtml        : mshtml.HTMLDocumentClass
+      RawContentLength  : 27
+
+
+    ## powershell ==> gRPC
 
     go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest
 
@@ -123,29 +187,53 @@ Build & Run locally:
 ///////////////////////////////////////////////////////////
 
 ## Build Docker image:
-
 docker build -t golang_demo_001 . 
 
 ## create a tag previous to publish
-3) docker tag golang_demo_001:latest apereznwogmail/golang_demo_001:latest
+docker tag golang_demo_001:latest apereznwogmail/golang_demo_001:latest
 
 ## log into docker for publish
     ## if docker desktop installed
-      4.1) docker login
+      docker login
 
     ## get PAT from https://app.docker.com/accounts/apereznwogmail/settings/personal-access-tokens
-      4.1) echo "YOUR_PAT_HERE" | docker login --username apereznwogmail --password-stdin
+      echo "YOUR_PAT_HERE" | docker login --username apereznwogmail --password-stdin
     
     ## must return 'Login Succeeded'
 
 # publish in docker hub
 # https://hub.docker.com/
-5) docker push apereznwogmail/golang_demo_001:latest 
+docker push apereznwogmail/golang_demo_001:latest 
+
+## clear disk space ==> codespaces
+
+  # This removes all stopped containers, unused networks, and dangling images
+  docker system prune -a --volumes -f
+
+  # This clears out hidden build caches (crucial for freeing up space)
+  docker builder prune -a -f
+
+  # Check disk space (outside visual studio code ==> command line)
+  dir c:
+  38 dirs   6.217.875.456 bytes libres
+
+///////////////////////////////////////////////////////////
+// REMOTE ESETUP
+///////////////////////////////////////////////////////////
 
 # URL FOR RENDER : https://dashboard.render.com/
-6) docker.io/apereznwogmail/golang_demo_001:latest
+# deploy latest reference
+docker.io/apereznwogmail/golang_demo_001:latest
 
-# CRONJOB
+# REMOTE TEST 
+https://golang-demo-001-latest-4rir.onrender.com/api/version/go
+{"go_version":"go1.27.1"}
+
+https://golang-demo-001-latest-4rir.onrender.com/api/version/server
+{"server_version":"1.0.0"}
+
+# CRONJOB - https://console.cron-job.org/dashboard
+https://golang-demo-001-latest-4rir.onrender.com/ping
 
 ///////////////////////////////////////////////////////////
 

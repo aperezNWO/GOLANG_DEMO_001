@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"runtime"
 	"strconv"
 	"time"
 
@@ -47,6 +48,8 @@ func main() {
 	mux.HandleFunc("GET /GenerateRandomVertex_SpringBoot", handleRandomVertex)
 	mux.HandleFunc("GET /api/data/getAllLogs", handleGetAllLogs)
 	mux.HandleFunc("GET /api/data/getAllPersons", handleGetAllPersons)
+	mux.HandleFunc("GET /api/version/go", handleGetGoVersion)
+	mux.HandleFunc("GET /api/version/server", handleGetServerVersion)
 
 	// Wrap REST mux with custom middleware pipeline
 	restHandler := recoveryMiddleware(corsMiddleware(loggingMiddleware(mux)))
@@ -242,4 +245,18 @@ func handleGetAllPersons(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(persons)
+}
+
+func handleGetGoVersion(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{
+		"go_version": runtime.Version(),
+	})
+}
+
+func handleGetServerVersion(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{
+		"server_version": "1.0.0",
+	})
 }
